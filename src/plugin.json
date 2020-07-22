@@ -1,0 +1,37 @@
+{
+  "type": "panel",
+  "name": "alert-manager-table",
+  "id": "raj-sameer-alert-manager-table",
+  "info": {
+    "description": "table for alert manager plugins",
+    "author": {
+      "name": "sameer raj",
+      "url": "https://github.com/rajsameer"
+    },
+    "keywords": [
+      "alert manager",
+      "prometheus"
+    ],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/grafana/simple-react-panel"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/grafana/simple-react-panel/blob/master/LICENSE"
+      }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaVersion": "6.3.x",
+    "plugins": []
+  }
+}
