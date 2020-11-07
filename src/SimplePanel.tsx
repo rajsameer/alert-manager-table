@@ -1,65 +1,108 @@
 import React from 'react';
-import { PanelProps } from '@grafana/data';
-import { SimpleOptions, DisplayData } from 'types';
-import { css, cx } from 'emotion';
+import { FieldType, getTimeZoneInfo, PanelProps } from '@grafana/data';
+import { SimpleOptions, RowData } from 'types';
 import { stylesFactory } from '@grafana/ui';
-import { Card } from './Card'
+import { css, cx } from 'emotion';
+import { Row } from './Row';
 
 interface Props extends PanelProps<SimpleOptions> {}
 
 export const SimplePanel: React.FC<Props> = ({ options, data, width, height }) => {
   const styles = getStyles();
-  const uiData : DisplayData[] = [];
-  data.series.forEach((series,sIndex) => {
-    let numberOfRows = series.fields.find(field => field.name === "Time")?.values?.length ?? 0;
-    for(let vIndex = 0; vIndex < numberOfRows; vIndex++) {
-      const uiRow  = {} as DisplayData;
-      uiRow.header = series.fields.find(field => field.name === "alertname")?.values.get(vIndex);
-      const severity = series.fields.find(field => field.name === "severity")?.values.get(vIndex);
-      switch (true) {
-        case severity === 1 ||severity === 0 ||severity == null:
-          uiRow.icon = 'fa-info';
-          uiRow.color = "#868686"
-        break;
-        case severity === 2:
-          uiRow.icon = 'fa-exclamation';
-          uiRow.color = "#ed980e"
-        break;
-        case severity === 3:
-          uiRow.icon = 'fa-bolt';
-          uiRow.color = "#f64b5e"
-        break;
-        case severity === 4:
-          uiRow.icon = 'fa-bolt';
-          uiRow.color = "#f64b5e"
-        break;
-        default:
-      }
-      let dummyBody  = '\n'
-      series.fields.forEach(field => {
-        if(field.values.get(vIndex)) {
-          switch (field.name) {
-            case "Time":
-              dummyBody = dummyBody + field.name.toUpperCase() + ' : ' + new Date(field.values.get(vIndex)[0]).toUTCString() + '\n'
+  const frame = data.series[0];
+  const timefield = frame.fields.find(field =>
+    options.timefield ? field.name === options.timefield : field.type === FieldType.time
+  );
+  const column_b = frame.fields.find(field =>
+    options.column_b ? field.name === options.column_b : field.type === FieldType.string
+  );
+  const column_c = frame.fields.find(field =>
+    options.column_c ? field.name === options.column_c : field.type === FieldType.string
+  );
+  const column_d = frame.fields.find(field =>
+    options.column_d ? field.name === options.column_d : field.type === FieldType.string
+  );
+
+  let rows: RowData[] = [];
+  const timezone = data.request?.timezone === undefined ? 'browser' : data.request?.timezone;
+  const timeZoneInfo = getTimeZoneInfo(timezone, timefield?.values.get(0));
+
+  const fields = frame.fields;
+  for (let i = 0; i < frame.length; i++) {
+    let row: RowData = {
+      timeValue: '',
+      colum_b_value: '',
+      colum_c_value: '',
+      colum_d_value: '',
+      cardData: '',
+      isCardDisaplyed: false,
+      rowColor: 'none',
+    };
+    //row.timeValue = new Date(timefield?.values.get(i)[0] + -1 * timeZoneOffset * 60 * 1000).toString();
+    row.timeValue = new Date(timefield?.values.get(i)[0]).toLocaleString(navigator.language, {
+      timeZone: timeZoneInfo?.ianaName,
+    });
+    row.colum_b_value = column_b?.values.get(i);
+    row.colum_c_value =
+      column_c?.values.get(i) === 1 || column_c?.values.get(i) === 0 || column_c?.values.get(i) === null
+        ? 'Info'
+        : column_c?.values.get(i) === 2
+        ? 'Warning'
+        : column_c?.values.get(i) === 3
+        ? 'High'
+        : column_c?.values.get(i) === 4
+        ? 'Critical'
+        : 'Undefined';
+    row.colum_d_value = column_d?.values.get(i);
+    let color = column_c?.config.thresholds?.steps.find(
+      s =>
+        s.value ===
+        (column_c?.values.get(i) === 1 || column_c?.values.get(i) === 0 || column_c?.values.get(i) === null
+          ? 1
+          : column_c?.values.get(i) === 2
+          ? 2
+          : column_c?.values.get(i) === 3
+          ? 3
+          : column_c?.values.get(i) === 4
+          ? 4
+          : 1)
+    )?.color;
+
+    row.rowColor = color === undefined ? 'rgb(218, 217, 211)' : color;
+    let dummyBody = '';
+    fields.forEach(field => {
+      if (field.values.get(i)) {
+        switch (field.name) {
+          case 'Time':
+            dummyBody =
+              dummyBody + field.name.toUpperCase() + ' : ' + new Date(field.values.get(i)[0]).toUTCString() + '\n';
             break;
-            case "severity":
-              dummyBody = dummyBody + field.name.toUpperCase() + ' : ' + 
-              (field.values.get(vIndex) === 1 ||field.values.get(vIndex) === 0 ||field.values.get(vIndex) == null ? 'Info' : 
-              (field.values.get(vIndex) == 2 ? 'Warning' : 
-              (field.values.get(vIndex) == 3 ? 'High' :
-              (field.values.get(vIndex) == 4 ? 'Critical': 'Undefined')))) + '\n'
+          case 'severity':
+            dummyBody =
+              dummyBody +
+              field.name.toUpperCase() +
+              ' : ' +
+              (field.values.get(i) === 1 || field.values.get(i) === 0 || field.values.get(i) === null
+                ? 'Info'
+                : field.values.get(i) === 2
+                ? 'Warning'
+                : field.values.get(i) === 3
+                ? 'High'
+                : field.values.get(i) === 4
+                ? 'Critical'
+                : 'Undefined') +
+              '\n';
             break;
-            default:
-              dummyBody = dummyBody + field.name.toUpperCase() + ' : ' + field.values.get(vIndex) + '\n'
-          }
-           
+          default:
+            dummyBody = dummyBody + field.name.toUpperCase() + ' : ' + field.values.get(i) + '\n';
         }
-      })
-      uiRow.body = dummyBody
-      uiData.push(uiRow)
-    }
-    
-  })
+      }
+    });
+    row.cardData = dummyBody;
+
+    rows.push(row);
+  }
+
   return (
     <div
       className={cx(
@@ -67,18 +110,48 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }) =
         css`
           width: ${width}px;
           height: ${height}px;
-          overflow: auto;
         `
       )}
     >
-      {
-        uiData.map((row,i) => {
-          return <Card header={row.header} icon={row.icon} body={row.body} bodyDisplay={false} color={row.color}></Card>
-        })
-            
-      }
-
-      
+      <div className={cx(styles.overflow_auto)}>
+        <table
+          className={cx(
+            styles.overflow_auto,
+            css`
+              width: ${width}px;
+              height: ${height}px;
+            `
+          )}
+        >
+          <thead className={cx(styles.pug_table)}>
+            <th className={cx(styles.pug_table_th)}>
+              {timefield?.config.displayName === undefined ? timefield?.name : timefield?.config.displayName}
+            </th>
+            <th className={cx(styles.pug_table_th)}>
+              {column_b?.config.displayName === undefined ? column_b?.name : column_b?.config.displayName}
+            </th>
+            <th className={cx(styles.pug_table_th)}>
+              {column_c?.config.displayName === undefined ? column_c?.name : column_c?.config.displayName}
+            </th>
+            <th className={cx(styles.pug_table_th)}>
+              {column_d?.config.displayName === undefined ? column_d?.name : column_d?.config.displayName}
+            </th>
+          </thead>
+          <tbody className={cx(styles.pug_table)}>
+            {rows.map(r => (
+              <Row
+                timeValue={r.timeValue}
+                colum_b_value={r.colum_b_value}
+                colum_c_value={r.colum_c_value}
+                colum_d_value={r.colum_d_value}
+                cardData={r.cardData}
+                isCardDisaplyed={r.isCardDisaplyed}
+                rowColor={r.rowColor}
+              ></Row>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
@@ -87,6 +160,7 @@ const getStyles = stylesFactory(() => {
   return {
     wrapper: css`
       position: relative;
+      overflow: scroll;
     `,
     svg: css`
       position: absolute;
@@ -98,6 +172,34 @@ const getStyles = stylesFactory(() => {
       bottom: 0;
       left: 0;
       padding: 10px;
+    `,
+    tableconatiner: css`
+      margin: 10px;
+      padding: 0;
+      border: 1px solid #e5e5e5;
+      border-radius: 5px;
+    `,
+    overflow_auto: css`
+      overflow: inherit;
+    `,
+    pug_table: css`
+      font-family: Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+      overflow: inherit;
+    `,
+    pug_table_td: css`
+      border: 1px solid #ddd;
+      padding: 8px;
+    `,
+    pug_table_th: css`
+      border-top: 2px solid #696969;
+      border-bottom: 2px solid #696969;
+      padding: 8px;
+      font-weight: bold;
+      font-size: 16px;
+      text-align: left;
+      color: grey;
     `,
   };
 });
