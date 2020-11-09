@@ -22,6 +22,21 @@ export interface RowData {
   colum_c_value: string;
   colum_d_value: string;
   cardData: string;
-  isCardDisaplyed: boolean;
   rowColor: string;
+  isCardDisaplyed: boolean;
+  rowSize: number;
+  timeEpoch?: number;
+}
+
+export interface RowProps {
+  index: number;
+  style?: any;
+  data: RowData[];
+  toggleSize: (para: number) => void;
+}
+
+export interface ListData {
+  rows: RowData[];
+  height: number;
+  width: number;
 }
