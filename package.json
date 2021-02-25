@@ -1,0 +1,27 @@
+{
+  "name": "raj-sameer-alert-manager-table",
+  "version": "1.0.0",
+  "description": "table for alert manager plugins",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "sign": "grafana-toolkit plugin:sign"
+  },
+  "author": "sameer raj",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@grafana/data": "^7.4.3",
+    "@grafana/toolkit": "^7.4.3",
+    "@grafana/ui": "^7.4.3",
+    "@types/react-window": "^1.8.2",
+    "emotion": "10.0.27"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "dependencies": {
+    "react-window": "^1.8.6"
+  }
+}
