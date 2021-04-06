@@ -80,8 +80,9 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }) =
       case column_c?.values.get(i) === 'info' || column_c?.values.get(i) === 'INFO':
         color = 'rgb(244, 206, 14)';
         break;
-      default:
-        color = 'rgb(132, 132, 132)';
+      case column_c?.values.get(i) === 'none' || column_c?.values.get(i) === 'NONE':
+        color = 'rgb(244, 206, 14)';
+        break;
     }
 
     row.rowColor = color === undefined ? 'rgb(218, 217, 211)' : color;
