@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ListData } from 'types';
 import { VariableSizeList as List } from 'react-window';
 import { Row } from './Row';
@@ -8,6 +8,9 @@ export const ListWarpper: React.FC<ListData> = (props) => {
 
   const [rowsin, setRows] = useState(props.rows);
 
+  useEffect(() => {
+    setRows(props.rows);
+  }, [props.rows]);
   const toggleSize = (index: number) => {
     if (listRef.current) {
       listRef.current.resetAfterIndex(index);
