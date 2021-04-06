@@ -33,7 +33,9 @@ export const ListWarpper: React.FC<ListData> = (props) => {
     return rowsin[index].rowSize;
   };
   const listRef = React.useRef<List>(null);
-
+  if (listRef.current) {
+    listRef.current.resetAfterIndex(0);
+  }
   return (
     <List
       height={height - 30}

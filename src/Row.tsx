@@ -39,15 +39,18 @@ export const Row: React.FC<RowProps> = (props) => {
   const displaCard = isCardDisaplyed ? card : null;
 
   return (
-    <div
-      className={cx(styles.row)}
-      style={props.style}
-      onClick={() => {
-        setbodyDisplay(!isCardDisaplyed);
-        props.toggleSize(props.index);
-      }}
-    >
-      <div>
+    <div className={cx(styles.row)} style={props.style}>
+      <div
+        onClick={() => {
+          setbodyDisplay(!isCardDisaplyed);
+          props.toggleSize(props.index);
+        }}
+        className={cx(
+          css`
+            cursor: pointer;
+          `
+        )}
+      >
         <div className={cx(styles.cell)}>{rowValue.timeValue}</div>
         <div className={cx(styles.cell)}>{rowValue.colum_b_value}</div>
         <div

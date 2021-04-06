@@ -67,10 +67,22 @@ export const SimplePanel: React.FC<Props> = ({ options, data, width, height }) =
     } else {
       row.colum_c_value = column_c?.values.get(i);
     }
-
     row.colum_d_value = column_d?.values.get(i);
     let color = column_c?.config.thresholds?.steps.find((s) => s.value === parseInt(column_c?.values.get(i), 10))
       ?.color;
+    switch (true) {
+      case column_c?.values.get(i) === 'critical' || column_c?.values.get(i) === 'CRITICAL':
+        color = 'rgb(244, 75, 94)';
+        break;
+      case column_c?.values.get(i) === 'warning' || column_c?.values.get(i) === 'WARNING':
+        color = 'rgb(255, 151, 46)';
+        break;
+      case column_c?.values.get(i) === 'info' || column_c?.values.get(i) === 'INFO':
+        color = 'rgb(244, 206, 14)';
+        break;
+      default:
+        color = 'rgb(132, 132, 132)';
+    }
 
     row.rowColor = color === undefined ? 'rgb(218, 217, 211)' : color;
     let dummyBody = '';
